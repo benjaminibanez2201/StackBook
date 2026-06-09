@@ -6,10 +6,13 @@ import Categories from "./pages/Categories";
 import Templates from "./pages/Templates";
 import CreateTemplate from "./pages/CreateTemplate";
 import TemplateDetail from "./pages/TemplateDetail";
+import ThemeToggle from "./components/ThemeToggle";
+import "./styles/theme.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
+      <ThemeToggle />
       <Routes>
         <Route path="/" element={<Languages />} />
         <Route path="/create" element={<CreateTemplate />} />
