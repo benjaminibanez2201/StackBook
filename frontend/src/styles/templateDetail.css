@@ -1,0 +1,224 @@
+.template-detail-page {
+  width: min(1040px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+
+.template-detail__back-button,
+.template-detail__copy-button {
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.template-detail__back-button {
+  border: 1px solid #c9d3e3;
+  color: #445269;
+  background: #ffffff;
+}
+
+.template-detail__back-button:hover {
+  background: #f5f7fb;
+}
+
+.template-detail-header {
+  padding: 48px 0 40px;
+}
+
+.template-detail-header__eyebrow,
+.template-detail-files__eyebrow {
+  margin: 0 0 8px;
+  color: #52627a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.template-detail-header__title {
+  margin: 0;
+  color: #18212f;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.08;
+}
+
+.template-detail-header__description {
+  max-width: 760px;
+  margin: 18px 0 0;
+  color: #617086;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.template-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.template-detail-tag {
+  padding: 6px 11px;
+  border-radius: 999px;
+  color: #2948a4;
+  background: #edf1ff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.template-detail-files {
+  overflow: hidden;
+  border: 1px solid #e1e6ef;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgb(32 50 77 / 7%);
+}
+
+.template-detail-files__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 26px;
+}
+
+.template-detail-files__heading h2 {
+  margin: 0;
+  color: #18212f;
+  font-size: 1.35rem;
+}
+
+.template-detail__copy-button {
+  border: 0;
+  color: #ffffff;
+  background: #3157d5;
+  box-shadow: 0 8px 18px rgb(49 87 213 / 20%);
+}
+
+.template-detail__copy-button:hover {
+  background: #2748b8;
+}
+
+.template-detail-tabs {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 26px;
+  border-top: 1px solid #e9edf3;
+  border-bottom: 1px solid #e1e6ef;
+  background: #f8f9fc;
+}
+
+.template-detail-tab {
+  flex: 0 0 auto;
+  padding: 15px 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  color: #66758a;
+  background: transparent;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.template-detail-tab:hover {
+  color: #3157d5;
+}
+
+.template-detail-tab--active {
+  border-bottom-color: #3157d5;
+  color: #3157d5;
+}
+
+.template-detail-tab:focus-visible,
+.template-detail__back-button:focus-visible,
+.template-detail__copy-button:focus-visible {
+  outline: 3px solid rgb(49 87 213 / 25%);
+  outline-offset: 2px;
+}
+
+.template-detail-code {
+  background: #151b26;
+}
+
+.template-detail-code__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 20px;
+  border-bottom: 1px solid #293241;
+  color: #aeb9ca;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.template-detail-code pre {
+  min-height: 320px;
+  max-height: 620px;
+  margin: 0;
+  padding: 24px;
+  overflow: auto;
+  color: #e5eaf2;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  tab-size: 2;
+  white-space: pre;
+}
+
+.template-detail-files__empty {
+  margin: 0;
+  padding: 32px 26px;
+  border-top: 1px solid #e9edf3;
+  color: #66758a;
+  text-align: center;
+}
+
+.template-detail-status {
+  margin: 40px 0 24px;
+  padding: 28px;
+  border: 1px solid #e1e6ef;
+  border-radius: 14px;
+  color: #5d6b7f;
+  background: #ffffff;
+  text-align: center;
+}
+
+.template-detail-status--error {
+  border-color: #f2c6c6;
+  color: #9c2f2f;
+  background: #fff5f5;
+}
+
+@media (max-width: 640px) {
+  .template-detail-page {
+    width: min(100% - 28px, 1040px);
+    padding: 32px 0 48px;
+  }
+
+  .template-detail-header {
+    padding: 36px 0 30px;
+  }
+
+  .template-detail-files__heading {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .template-detail-tabs {
+    padding: 0 12px;
+  }
+
+  .template-detail__copy-button {
+    width: 100%;
+  }
+
+  .template-detail-code pre {
+    min-height: 260px;
+    padding: 18px;
+    font-size: 0.82rem;
+  }
+}

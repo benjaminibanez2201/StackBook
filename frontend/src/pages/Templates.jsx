@@ -1,14 +1,62 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import useGetTemplates from "../hooks/templates/useGetTemplates.js";
+import { deleteTemplate } from "../services/template.service.js";
 import "../styles/templates.css";
 
-function TemplateCard({ template }) {
+function TemplateCard({ template, onDeleted }) {
   const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
   const formattedDate = new Intl.DateTimeFormat("es-CL", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   }).format(new Date(template.createdAt));
+
+  const handleDelete = async (event) => {
+    event.stopPropagation();
+
+    const result = await Swal.fire({
+      icon: "warning",
+      title: "¿Eliminar template?",
+      text: `Se eliminará "${template.nombre}" de forma permanente.`,
+      showCancelButton: true,
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#c23d3d",
+      cancelButtonColor: "#66758a",
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      await deleteTemplate(template.id);
+      await onDeleted();
+
+      await Swal.fire({
+        icon: "success",
+        title: "Template eliminado",
+        text: "El template fue eliminado correctamente.",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#3157d5",
+      });
+    } catch {
+      await Swal.fire({
+        icon: "error",
+        title: "No se pudo eliminar",
+        text: "Ocurrió un error al eliminar el template.",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#3157d5",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <article
@@ -36,16 +84,27 @@ function TemplateCard({ template }) {
         </div>
       </div>
 
-      <time className="template-card__date" dateTime={template.createdAt}>
-        Creado el {formattedDate}
-      </time>
+      <footer className="template-card__footer">
+        <time className="template-card__date" dateTime={template.createdAt}>
+          Creado el {formattedDate}
+        </time>
+        <button
+          className="template-card__delete-button"
+          type="button"
+          disabled={deleting}
+          onClick={handleDelete}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          {deleting ? "Eliminando..." : "Eliminar"}
+        </button>
+      </footer>
     </article>
   );
 }
 
 function Templates() {
   const navigate = useNavigate();
-  const { templates, loading, error } = useGetTemplates();
+  const { templates, loading, error, refetch } = useGetTemplates();
 
   return (
     <main className="templates-page">
@@ -88,7 +147,11 @@ function Templates() {
       {!loading && !error && templates.length > 0 && (
         <section className="templates-grid" aria-label="Lista de templates">
           {templates.map((template) => (
-            <TemplateCard key={template.id} template={template} />
+            <TemplateCard
+              key={template.id}
+              template={template}
+              onDeleted={refetch}
+            />
           ))}
         </section>
       )}

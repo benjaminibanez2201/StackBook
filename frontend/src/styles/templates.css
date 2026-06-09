@@ -130,13 +130,40 @@ button {
   font-weight: 700;
 }
 
-.template-card__date {
-  display: block;
+.template-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-top: 24px;
   padding-top: 18px;
   border-top: 1px solid #edf0f5;
+}
+
+.template-card__date {
   color: #7a8798;
   font-size: 0.8rem;
+}
+
+.template-card__delete-button {
+  padding: 7px 11px;
+  border: 1px solid #edc4c4;
+  border-radius: 8px;
+  color: #a23737;
+  background: #fff7f7;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.template-card__delete-button:hover:not(:disabled) {
+  border-color: #d99b9b;
+  background: #ffeded;
+}
+
+.template-card__delete-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .templates-status {
