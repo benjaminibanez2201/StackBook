@@ -11,7 +11,14 @@ const emptyFile = () => ({
   content: "",
 });
 
-function validateForm({ nombre, descripcion, tags, files }) {
+function validateForm({
+  nombre,
+  descripcion,
+  lenguaje,
+  categoria,
+  tags,
+  files,
+}) {
   const errors = {};
 
   if (!nombre.trim()) {
@@ -24,6 +31,14 @@ function validateForm({ nombre, descripcion, tags, files }) {
 
   if (!descripcion.trim()) {
     errors.descripcion = "La descripción es obligatoria.";
+  }
+
+  if (!lenguaje) {
+    errors.lenguaje = "El lenguaje es obligatorio.";
+  }
+
+  if (!categoria) {
+    errors.categoria = "La categoría es obligatoria.";
   }
 
   if (tags.length === 0) {
@@ -52,6 +67,8 @@ function CreateTemplate() {
   const { create, loading, error } = useCreateTemplate();
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
+  const [lenguaje, setLenguaje] = useState("JavaScript");
+  const [categoria, setCategoria] = useState("Backend");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const [files, setFiles] = useState([emptyFile()]);
@@ -104,10 +121,23 @@ function CreateTemplate() {
     setFiles((current) => current.filter((file) => file.id !== id));
   };
 
+  const handleLanguageChange = (event) => {
+    const selectedLanguage = event.target.value;
+    setLenguaje(selectedLanguage);
+    setCategoria(selectedLanguage === "JavaScript" ? "Backend" : "General");
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const formData = { nombre, descripcion, tags, files };
+    const formData = {
+      nombre,
+      descripcion,
+      lenguaje,
+      categoria,
+      tags,
+      files,
+    };
     const newErrors = validateForm(formData);
     setValidationErrors(newErrors);
 
@@ -118,6 +148,8 @@ function CreateTemplate() {
     const createdTemplate = await create({
       nombre: nombre.trim(),
       descripcion: descripcion.trim(),
+      lenguaje,
+      categoria,
       tags,
       files: files.map(({ fileName, type, content }) => ({
         fileName: fileName.trim(),
@@ -204,6 +236,57 @@ function CreateTemplate() {
                 {validationErrors.descripcion}
               </p>
             )}
+          </div>
+
+          <div className="template-form__select-row">
+            <div className="template-form__field">
+              <label htmlFor="lenguaje">Lenguaje</label>
+              <select
+                id="lenguaje"
+                name="lenguaje"
+                value={lenguaje}
+                onChange={handleLanguageChange}
+                required
+                aria-invalid={Boolean(validationErrors.lenguaje)}
+              >
+                <option value="JavaScript">JavaScript</option>
+                <option value="Python">Python</option>
+                <option value="Java">Java</option>
+                <option value="C++">C++</option>
+                <option value="C#">C#</option>
+              </select>
+              {validationErrors.lenguaje && (
+                <p className="template-form__error">
+                  {validationErrors.lenguaje}
+                </p>
+              )}
+            </div>
+
+            <div className="template-form__field">
+              <label htmlFor="categoria">Categoría</label>
+              <select
+                id="categoria"
+                name="categoria"
+                value={categoria}
+                onChange={(event) => setCategoria(event.target.value)}
+                required
+                aria-invalid={Boolean(validationErrors.categoria)}
+              >
+                {lenguaje === "JavaScript" ? (
+                  <>
+                    <option value="Backend">Backend</option>
+                    <option value="Frontend">Frontend</option>
+                  </>
+                ) : (
+                  <option value="General">General</option>
+                )}
+              </select>
+              {validationErrors.categoria && (
+                <p className="template-form__error">
+                  {validationErrors.categoria}
+                </p>
+              )}
+            </div>
           </div>
         </section>
 
