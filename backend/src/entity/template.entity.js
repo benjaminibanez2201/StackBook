@@ -19,6 +19,14 @@ const TemplateSchema = new EntitySchema({
       type: "text",
       nullable: false,
     },
+    lenguaje: {
+      type: "varchar",
+      nullable: false,
+    },
+    categoria: {
+      type: "varchar",
+      nullable: false,
+    },
 
     tags: {
         type: "simple-array",

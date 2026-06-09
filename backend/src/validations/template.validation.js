@@ -67,6 +67,8 @@ export const templateQueryValidation = Joi.object({
 
 export const templateCreateValidation = Joi.object({
   nombre: nombre.required().messages({ "any.required": "El nombre es obligatorio." }),
+  lenguaje: Joi.string().required(),
+  categoria: Joi.string().required(),
   descripcion: descripcion.required().messages({ "any.required": "La descripción es obligatoria." }),
   tags: tags.required().messages({ "any.required": "Las etiquetas son obligatorias." }),
   files: files.required().messages({ "any.required": "Los archivos son obligatorios." }),
