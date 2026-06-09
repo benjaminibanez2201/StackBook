@@ -1,5 +1,404 @@
-function CreateTemplate() {
-    return <div>CreateTemplate</div>;
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import useCreateTemplate from "../hooks/templates/useCreateTemplate.js";
+import "../styles/createTemplate.css";
+
+const emptyFile = () => ({
+  id: crypto.randomUUID(),
+  fileName: "",
+  type: "jsx",
+  content: "",
+});
+
+function validateForm({ nombre, descripcion, tags, files }) {
+  const errors = {};
+
+  if (!nombre.trim()) {
+    errors.nombre = "El nombre es obligatorio.";
+  } else if (nombre.trim().length < 3) {
+    errors.nombre = "El nombre debe tener al menos 3 caracteres.";
+  } else if (nombre.trim().length > 50) {
+    errors.nombre = "El nombre no puede superar los 50 caracteres.";
   }
-  
-  export default CreateTemplate;
+
+  if (!descripcion.trim()) {
+    errors.descripcion = "La descripción es obligatoria.";
+  }
+
+  if (tags.length === 0) {
+    errors.tags = "Agrega al menos un tag.";
+  }
+
+  if (files.length === 0) {
+    errors.files = "Agrega al menos un archivo.";
+  } else {
+    const fileErrors = files.map((file) => ({
+      fileName: file.fileName.trim() ? "" : "El nombre es obligatorio.",
+      type: file.type.trim() ? "" : "El tipo es obligatorio.",
+      content: file.content.trim() ? "" : "El contenido es obligatorio.",
+    }));
+
+    if (fileErrors.some((file) => Object.values(file).some(Boolean))) {
+      errors.fileItems = fileErrors;
+    }
+  }
+
+  return errors;
+}
+
+function CreateTemplate() {
+  const navigate = useNavigate();
+  const { create, loading, error } = useCreateTemplate();
+  const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [tagInput, setTagInput] = useState("");
+  const [tags, setTags] = useState([]);
+  const [files, setFiles] = useState([emptyFile()]);
+  const [validationErrors, setValidationErrors] = useState({});
+
+  const addTag = () => {
+    const newTag = tagInput.trim();
+
+    if (!newTag) {
+      setValidationErrors((current) => ({
+        ...current,
+        tags: "Escribe un tag antes de agregarlo.",
+      }));
+      return;
+    }
+
+    if (tags.some((tag) => tag.toLowerCase() === newTag.toLowerCase())) {
+      setValidationErrors((current) => ({
+        ...current,
+        tags: "Ese tag ya fue agregado.",
+      }));
+      return;
+    }
+
+    setTags((current) => [...current, newTag]);
+    setTagInput("");
+    setValidationErrors((current) => ({ ...current, tags: "" }));
+  };
+
+  const handleTagKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addTag();
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setTags((current) => current.filter((tag) => tag !== tagToRemove));
+  };
+
+  const updateFile = (id, field, value) => {
+    setFiles((current) =>
+      current.map((file) =>
+        file.id === id ? { ...file, [field]: value } : file,
+      ),
+    );
+  };
+
+  const removeFile = (id) => {
+    setFiles((current) => current.filter((file) => file.id !== id));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const formData = { nombre, descripcion, tags, files };
+    const newErrors = validateForm(formData);
+    setValidationErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      return;
+    }
+
+    const createdTemplate = await create({
+      nombre: nombre.trim(),
+      descripcion: descripcion.trim(),
+      tags,
+      files: files.map(({ fileName, type, content }) => ({
+        fileName: fileName.trim(),
+        type: type.trim(),
+        content,
+      })),
+    });
+
+    if (!createdTemplate) {
+      return;
+    }
+
+    await Swal.fire({
+      icon: "success",
+      title: "Template guardado",
+      text: "El template fue creado correctamente.",
+      confirmButtonText: "Continuar",
+      confirmButtonColor: "#3157d5",
+    });
+
+    navigate("/");
+  };
+
+  return (
+    <main className="create-template-page">
+      <header className="create-template-header">
+        <p className="create-template-header__eyebrow">Nuevo recurso</p>
+        <h1 className="create-template-header__title">Crear template</h1>
+        <p className="create-template-header__description">
+          Define la información, etiquetas y archivos que formarán tu template.
+        </p>
+      </header>
+
+      <form className="template-form" onSubmit={handleSubmit} noValidate>
+        <section className="template-form__section">
+          <div className="template-form__section-heading">
+            <span className="template-form__step">01</span>
+            <div>
+              <h2>Información general</h2>
+              <p>Datos principales para identificar el template.</p>
+            </div>
+          </div>
+
+          <div className="template-form__field">
+            <label htmlFor="nombre">Nombre</label>
+            <input
+              id="nombre"
+              name="nombre"
+              type="text"
+              value={nombre}
+              maxLength={50}
+              onChange={(event) => setNombre(event.target.value)}
+              aria-invalid={Boolean(validationErrors.nombre)}
+              aria-describedby={
+                validationErrors.nombre ? "nombre-error" : undefined
+              }
+              placeholder="Ej. Dashboard administrativo"
+            />
+            {validationErrors.nombre && (
+              <p className="template-form__error" id="nombre-error">
+                {validationErrors.nombre}
+              </p>
+            )}
+          </div>
+
+          <div className="template-form__field">
+            <label htmlFor="descripcion">Descripción</label>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              value={descripcion}
+              rows={5}
+              onChange={(event) => setDescripcion(event.target.value)}
+              aria-invalid={Boolean(validationErrors.descripcion)}
+              aria-describedby={
+                validationErrors.descripcion
+                  ? "descripcion-error"
+                  : undefined
+              }
+              placeholder="Describe brevemente el propósito del template"
+            />
+            {validationErrors.descripcion && (
+              <p className="template-form__error" id="descripcion-error">
+                {validationErrors.descripcion}
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section className="template-form__section">
+          <div className="template-form__section-heading">
+            <span className="template-form__step">02</span>
+            <div>
+              <h2>Tags</h2>
+              <p>Agrega palabras clave para organizar el template.</p>
+            </div>
+          </div>
+
+          <div className="template-form__field">
+            <label htmlFor="tag">Nuevo tag</label>
+            <div className="template-form__inline-field">
+              <input
+                id="tag"
+                type="text"
+                value={tagInput}
+                onChange={(event) => setTagInput(event.target.value)}
+                onKeyDown={handleTagKeyDown}
+                aria-invalid={Boolean(validationErrors.tags)}
+                aria-describedby={
+                  validationErrors.tags ? "tags-error" : undefined
+                }
+                placeholder="Ej. React"
+              />
+              <button
+                className="template-form__secondary-button"
+                type="button"
+                onClick={addTag}
+              >
+                Agregar
+              </button>
+            </div>
+
+            {tags.length > 0 && (
+              <div className="template-form__tags" aria-label="Tags agregados">
+                {tags.map((tag) => (
+                  <span className="template-form__tag" key={tag}>
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      aria-label={`Eliminar tag ${tag}`}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {validationErrors.tags && (
+              <p className="template-form__error" id="tags-error">
+                {validationErrors.tags}
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section className="template-form__section">
+          <div className="template-form__section-heading template-form__section-heading--actions">
+            <div className="template-form__section-title">
+              <span className="template-form__step">03</span>
+              <div>
+                <h2>Archivos</h2>
+                <p>Incluye el código que formará parte del template.</p>
+              </div>
+            </div>
+
+            <button
+              className="template-form__secondary-button"
+              type="button"
+              onClick={() => setFiles((current) => [...current, emptyFile()])}
+            >
+              Agregar archivo
+            </button>
+          </div>
+
+          {validationErrors.files && (
+            <p className="template-form__error">{validationErrors.files}</p>
+          )}
+
+          <div className="template-files">
+            {files.map((file, index) => {
+              const fileError = validationErrors.fileItems?.[index] ?? {};
+
+              return (
+                <fieldset className="template-file" key={file.id}>
+                  <legend>Archivo {index + 1}</legend>
+
+                  <button
+                    className="template-file__remove"
+                    type="button"
+                    onClick={() => removeFile(file.id)}
+                    aria-label={`Eliminar archivo ${index + 1}`}
+                  >
+                    Eliminar
+                  </button>
+
+                  <div className="template-file__row">
+                    <div className="template-form__field">
+                      <label htmlFor={`fileName-${file.id}`}>
+                        Nombre del archivo
+                      </label>
+                      <input
+                        id={`fileName-${file.id}`}
+                        type="text"
+                        value={file.fileName}
+                        onChange={(event) =>
+                          updateFile(file.id, "fileName", event.target.value)
+                        }
+                        aria-invalid={Boolean(fileError.fileName)}
+                        placeholder="Ej. App.jsx"
+                      />
+                      {fileError.fileName && (
+                        <p className="template-form__error">
+                          {fileError.fileName}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="template-form__field">
+                      <label htmlFor={`type-${file.id}`}>Tipo</label>
+                      <select
+                        id={`type-${file.id}`}
+                        value={file.type}
+                        onChange={(event) =>
+                          updateFile(file.id, "type", event.target.value)
+                        }
+                        aria-invalid={Boolean(fileError.type)}
+                      >
+                        <option value="jsx">JSX</option>
+                        <option value="js">JavaScript</option>
+                        <option value="css">CSS</option>
+                      </select>
+                      {fileError.type && (
+                        <p className="template-form__error">{fileError.type}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="template-form__field">
+                    <label htmlFor={`content-${file.id}`}>Contenido</label>
+                    <textarea
+                      id={`content-${file.id}`}
+                      className="template-file__content"
+                      value={file.content}
+                      rows={10}
+                      spellCheck="false"
+                      onChange={(event) =>
+                        updateFile(file.id, "content", event.target.value)
+                      }
+                      aria-invalid={Boolean(fileError.content)}
+                      placeholder="Escribe el contenido del archivo..."
+                    />
+                    {fileError.content && (
+                      <p className="template-form__error">
+                        {fileError.content}
+                      </p>
+                    )}
+                  </div>
+                </fieldset>
+              );
+            })}
+          </div>
+        </section>
+
+        {error && (
+          <p className="template-form__submit-error" role="alert">
+            {error}
+          </p>
+        )}
+
+        <div className="template-form__actions">
+          <button
+            className="template-form__cancel-button"
+            type="button"
+            onClick={() => navigate("/")}
+            disabled={loading}
+          >
+            Cancelar
+          </button>
+          <button
+            className="template-form__submit-button"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Guardando..." : "Guardar template"}
+          </button>
+        </div>
+      </form>
+    </main>
+  );
+}
+
+export default CreateTemplate;

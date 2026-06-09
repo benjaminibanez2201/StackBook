@@ -3,6 +3,7 @@ import useGetTemplates from "../hooks/templates/useGetTemplates.js";
 import "../styles/templates.css";
 
 function TemplateCard({ template }) {
+  const navigate = useNavigate();
   const formattedDate = new Intl.DateTimeFormat("es-CL", {
     day: "2-digit",
     month: "long",
@@ -10,7 +11,18 @@ function TemplateCard({ template }) {
   }).format(new Date(template.createdAt));
 
   return (
-    <article className="template-card">
+    <article
+      className="template-card"
+      role="link"
+      tabIndex={0}
+      onClick={() => navigate(`/templates/${template.id}`)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          navigate(`/templates/${template.id}`);
+        }
+      }}
+    >
       <div className="template-card__content">
         <h2 className="template-card__title">{template.nombre}</h2>
         <p className="template-card__description">{template.descripcion}</p>

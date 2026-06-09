@@ -110,6 +110,7 @@ button {
   color: #5d6b7f;
   line-height: 1.6;
   -webkit-box-orient: vertical;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
 }
 
