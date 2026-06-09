@@ -1,8 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import useGetTemplates from "../hooks/templates/useGetTemplates.js";
 import { deleteTemplate } from "../services/template.service.js";
+import {
+  getCategoryBySlug,
+  getLanguageBySlug,
+} from "../utils/templateNavigation.js";
 import "../styles/templates.css";
 
 function TemplateCard({ template, onDeleted }) {
@@ -103,17 +107,44 @@ function TemplateCard({ template, onDeleted }) {
 }
 
 function Templates() {
+  const { lenguaje, categoria } = useParams();
   const navigate = useNavigate();
-  const { templates, loading, error, refetch } = useGetTemplates();
+  const [search, setSearch] = useState("");
+  const language = getLanguageBySlug(lenguaje);
+  const category = getCategoryBySlug(language, categoria);
+  const { templates, loading, error, refetch } = useGetTemplates({
+    lenguaje: language?.name,
+    categoria: category?.name,
+  });
+  const filteredTemplates = templates.filter((template) =>
+    template.nombre.toLowerCase().includes(search.trim().toLowerCase()),
+  );
+
+  if (!language || !category) {
+    return <Navigate to="/" replace />;
+  }
+
+  const backPath = language.name === "JavaScript" ? `/${language.slug}` : "/";
 
   return (
     <main className="templates-page">
       <header className="templates-header">
         <div>
-          <p className="templates-header__eyebrow">Biblioteca</p>
-          <h1 className="templates-header__title">Templates</h1>
+          <button
+            className="templates-back-button"
+            type="button"
+            onClick={() => navigate(backPath)}
+          >
+            Volver
+          </button>
+          <p className="templates-header__eyebrow">
+            {language.name} / {category.name}
+          </p>
+          <h1 className="templates-header__title">
+            Templates de {category.name}
+          </h1>
           <p className="templates-header__description">
-            Explora y administra tus templates disponibles.
+            Explora los templates disponibles en esta carpeta.
           </p>
         </div>
 
@@ -125,6 +156,17 @@ function Templates() {
           Nuevo template
         </button>
       </header>
+
+      <div className="templates-search">
+        <label htmlFor="template-search">Buscar templates</label>
+        <input
+          id="template-search"
+          type="search"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Buscar por nombre..."
+        />
+      </div>
 
       {loading && (
         <p className="templates-status" role="status">
@@ -144,9 +186,15 @@ function Templates() {
         </p>
       )}
 
-      {!loading && !error && templates.length > 0 && (
+      {!loading && !error && templates.length > 0 && filteredTemplates.length === 0 && (
+        <p className="templates-status">
+          No se encontraron templates con ese nombre.
+        </p>
+      )}
+
+      {!loading && !error && filteredTemplates.length > 0 && (
         <section className="templates-grid" aria-label="Lista de templates">
-          {templates.map((template) => (
+          {filteredTemplates.map((template) => (
             <TemplateCard
               key={template.id}
               template={template}

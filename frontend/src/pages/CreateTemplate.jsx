@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import useCreateTemplate from "../hooks/templates/useCreateTemplate.js";
+import { getTemplatePath } from "../utils/templateNavigation.js";
 import "../styles/createTemplate.css";
 
 const emptyFile = () => ({
@@ -170,7 +171,7 @@ function CreateTemplate() {
       confirmButtonColor: "#3157d5",
     });
 
-    navigate("/");
+    navigate(getTemplatePath(lenguaje, categoria));
   };
 
   return (

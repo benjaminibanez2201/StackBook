@@ -35,12 +35,56 @@ button {
 }
 
 .templates-header__eyebrow {
-  margin: 0 0 8px;
+  margin: 22px 0 8px;
   color: #52627a;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.templates-back-button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid #c9d3e3;
+  border-radius: 10px;
+  color: #445269;
+  background: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.templates-back-button:hover {
+  background: #f5f7fb;
+}
+
+.templates-search {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.templates-search label {
+  color: #283548;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.templates-search input {
+  width: min(100%, 480px);
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #ccd4e0;
+  border-radius: 10px;
+  outline: none;
+  color: #18212f;
+  background: #ffffff;
+  font: inherit;
+}
+
+.templates-search input:focus {
+  border-color: #3157d5;
+  box-shadow: 0 0 0 3px rgb(49 87 213 / 12%);
 }
 
 .templates-header__title {
