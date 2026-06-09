@@ -8,6 +8,7 @@ import {
 } from "../services/template.service.js";
 import {
   templateCreateValidation,
+  templateFiltersValidation,
   templateQueryValidation,
 } from "../validations/template.validation.js";
 import {
@@ -39,7 +40,13 @@ export async function createTemplate(req, res) {
 
 export async function getTemplates(req, res) {
   try {
-    const [templates, serviceError] = await getTemplatesService();
+    const { error, value } = templateFiltersValidation.validate(req.query);
+
+    if (error) {
+      return handleErrorClient(res, 400, "Error de validacion", error.message);
+    }
+
+    const [templates, serviceError] = await getTemplatesService(value);
 
     if (serviceError) {
       return handleErrorServer(res, 500, serviceError);

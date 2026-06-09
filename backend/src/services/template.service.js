@@ -25,9 +25,15 @@ export async function createTemplate(data) {
   }
 }
 
-export async function getTemplates() {
+export async function getTemplates({ lenguaje, categoria } = {}) {
   try {
+    const where = {};
+
+    if (lenguaje) where.lenguaje = lenguaje;
+    if (categoria) where.categoria = categoria;
+
     const templates = await templateRepository.find({
+      where,
       order: {
         createdAt: "DESC",
       },
