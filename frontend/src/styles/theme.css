@@ -132,6 +132,7 @@ select {
 :root[data-theme="dark"] .template-card,
 :root[data-theme="dark"] .templates-status,
 :root[data-theme="dark"] .template-form__section,
+:root[data-theme="dark"] .template-detail-header,
 :root[data-theme="dark"] .template-detail-files,
 :root[data-theme="dark"] .template-detail-status {
   border-color: var(--theme-border);
@@ -200,6 +201,26 @@ select {
 
 :root[data-theme="dark"] .template-detail-tabs {
   background: var(--theme-surface-soft);
+}
+
+:root[data-theme="dark"] .template-detail-meta {
+  border-color: var(--theme-border);
+}
+
+:root[data-theme="dark"] .template-detail-meta div {
+  background: var(--theme-surface-soft);
+}
+
+:root[data-theme="dark"] .template-detail-meta div + div {
+  border-color: var(--theme-border);
+}
+
+:root[data-theme="dark"] .template-detail-meta dt {
+  color: var(--theme-text-muted);
+}
+
+:root[data-theme="dark"] .template-detail-meta dd {
+  color: var(--theme-text);
 }
 
 :root[data-theme="dark"] .template-detail-tab {

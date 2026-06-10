@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import CodeBlock from "../components/CodeBlock.jsx";
 import useGetTemplate from "../hooks/templates/useGetTemplate.js";
 import "../styles/templateDetail.css";
 
@@ -76,21 +77,40 @@ function TemplateDetail() {
       </button>
 
       <header className="template-detail-header">
-        <p className="template-detail-header__eyebrow">Detalle del template</p>
-        <h1 className="template-detail-header__title">{template.nombre}</h1>
-        <p className="template-detail-header__description">
-          {template.descripcion}
-        </p>
+        <div className="template-detail-header__main">
+          <p className="template-detail-header__eyebrow">
+            Detalle del template
+          </p>
+          <h1 className="template-detail-header__title">{template.nombre}</h1>
+          <p className="template-detail-header__description">
+            {template.descripcion}
+          </p>
 
-        {template.tags?.length > 0 && (
-          <div className="template-detail-tags" aria-label="Etiquetas">
-            {template.tags.map((tag) => (
-              <span className="template-detail-tag" key={tag}>
-                {tag}
-              </span>
-            ))}
+          {template.tags?.length > 0 && (
+            <div className="template-detail-tags" aria-label="Etiquetas">
+              {template.tags.map((tag) => (
+                <span className="template-detail-tag" key={tag}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <dl className="template-detail-meta">
+          <div>
+            <dt>Lenguaje</dt>
+            <dd>{template.lenguaje}</dd>
           </div>
-        )}
+          <div>
+            <dt>Categoría</dt>
+            <dd>{template.categoria}</dd>
+          </div>
+          <div>
+            <dt>Archivos</dt>
+            <dd>{files.length}</dd>
+          </div>
+        </dl>
       </header>
 
       <section className="template-detail-files" aria-labelledby="files-title">
@@ -148,12 +168,19 @@ function TemplateDetail() {
               aria-labelledby={`file-tab-${activeFile.id}`}
             >
               <div className="template-detail-code__header">
-                <span>{activeFile.fileName}</span>
-                <span>{activeFile.type.toUpperCase()}</span>
+                <div className="template-detail-code__window">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <span className="template-detail-code__filename">
+                  {activeFile.fileName}
+                </span>
+                <span className="template-detail-code__type">
+                  {activeFile.type.toUpperCase()}
+                </span>
               </div>
-              <pre>
-                <code>{activeFile.content}</code>
-              </pre>
+              <CodeBlock content={activeFile.content} />
             </div>
           </>
         )}
