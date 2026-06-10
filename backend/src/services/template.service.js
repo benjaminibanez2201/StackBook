@@ -103,6 +103,53 @@ export async function getTemplateFiles(id) {
   }
 }
 
+export async function updateTemplate(id, data) {
+  try {
+    const updatedTemplate = await AppDataSource.transaction(async (manager) => {
+      const transactionTemplateRepository = manager.getRepository("Template");
+      const templateFound = await transactionTemplateRepository.findOne({
+        where: { id },
+        relations: {
+          templateFiles: true,
+        },
+      });
+
+      if (!templateFound) {
+        return null;
+      }
+
+      const { files, ...templateData } = data;
+      Object.assign(templateFound, templateData);
+
+      if (files) {
+        await manager
+          .createQueryBuilder()
+          .delete()
+          .from("TemplateFile")
+          .where('"templateId" = :id', { id })
+          .execute();
+
+        templateFound.templateFiles = files.map((file) => ({
+          fileName: file.fileName,
+          content: file.content,
+          type: file.type,
+        }));
+      }
+
+      return transactionTemplateRepository.save(templateFound);
+    });
+
+    if (!updatedTemplate) {
+      return [null, "Template no encontrado"];
+    }
+
+    return [updatedTemplate, null];
+  } catch (error) {
+    console.error("Error al actualizar el template:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
 export async function deleteTemplate(id) {
     try {
       const templateFound = await templateRepository.findOne({

@@ -7,6 +7,7 @@ import {
   getTemplateFiles,
   getTemplates,
   searchTemplates,
+  updateTemplate,
 } from "../controllers/template.controller.js";
 
 const router = Router();
@@ -16,6 +17,7 @@ router.get("/", getTemplates);
 router.get("/search", searchTemplates);
 router.get("/:id", getTemplateById);
 router.get("/:id/files", getTemplateFiles);
+router.patch("/:id", updateTemplate);
 router.delete("/:id", deleteTemplate);
 
 export default router;

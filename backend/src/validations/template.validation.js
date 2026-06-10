@@ -34,21 +34,32 @@ const descripcion = Joi.string()
     "array.base": "Los archivos deben ser de tipo array.",
     "array.items": "Cada archivo debe ser de tipo objeto.",
     "object.base": "Cada archivo debe ser de tipo objeto.",
-    "object.missing": "Cada archivo debe tener un nombre, contenido y tipo (jsx, css, js).",
+    "object.missing": "Cada archivo debe tener un nombre, contenido y tipo.",
   });
 
 export const templateBodyValidation = Joi.object({
   nombre: nombre,
   descripcion: descripcion,
+  lenguaje: Joi.string(),
+  categoria: Joi.string(),
+  subcategoria: Joi.string(),
   tags: tags,
   files: files,
 })
-  .or("nombre", "descripcion", "tags", "files")
+  .or(
+    "nombre",
+    "descripcion",
+    "lenguaje",
+    "categoria",
+    "subcategoria",
+    "tags",
+    "files",
+  )
   .unknown(false)
   .messages({
     "object.unknown": "No se permiten propiedades adicionales.",
     "object.missing":
-      "Debes proporcionar al menos un parámetro: nombre, descripcion, tags o files.",
+      "Debes proporcionar al menos un campo para actualizar.",
   });
 
 export const templateQueryValidation = Joi.object({

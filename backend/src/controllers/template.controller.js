@@ -5,9 +5,11 @@ import {
   getTemplateFiles as getTemplateFilesService,
   getTemplates as getTemplatesService,
   searchTemplates as searchTemplatesService,
+  updateTemplate as updateTemplateService,
   deleteTemplate as deleteTemplateService,
 } from "../services/template.service.js";
 import {
+  templateBodyValidation,
   templateCreateValidation,
   templateFiltersValidation,
   templateQueryValidation,
@@ -124,6 +126,45 @@ export async function getTemplateFiles(req, res) {
     return handleSuccess(res, 200, "Archivos encontrados", files);
   } catch (error) {
     console.error("Error en template.controller -> getTemplateFiles():", error);
+    return handleErrorServer(res, 500, "Error interno del servidor");
+  }
+}
+
+export async function updateTemplate(req, res) {
+  try {
+    const { error: paramsError } = templateQueryValidation.validate(req.params);
+    const { error: bodyError } = templateBodyValidation.validate(req.body);
+
+    if (paramsError || bodyError) {
+      return handleErrorClient(
+        res,
+        400,
+        "Error de validacion",
+        paramsError?.message ?? bodyError.message,
+      );
+    }
+
+    const [template, serviceError] = await updateTemplateService(
+      Number(req.params.id),
+      req.body,
+    );
+
+    if (serviceError === "Template no encontrado") {
+      return handleErrorClient(res, 404, serviceError);
+    }
+
+    if (serviceError) {
+      return handleErrorServer(res, 500, serviceError);
+    }
+
+    return handleSuccess(
+      res,
+      200,
+      "Template actualizado correctamente",
+      template,
+    );
+  } catch (error) {
+    console.error("Error en template.controller -> updateTemplate():", error);
     return handleErrorServer(res, 500, "Error interno del servidor");
   }
 }

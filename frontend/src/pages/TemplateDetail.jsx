@@ -75,6 +75,13 @@ function TemplateDetail() {
       >
         Volver
       </button>
+      <button
+        className="template-detail__edit-button"
+        type="button"
+        onClick={() => navigate(`/templates/${template.id}/edit`)}
+      >
+        Editar template
+      </button>
 
       <header className="template-detail-header">
         <div className="template-detail-header__main">
@@ -105,6 +112,10 @@ function TemplateDetail() {
           <div>
             <dt>Categoría</dt>
             <dd>{template.categoria}</dd>
+          </div>
+          <div>
+            <dt>Subcategoría</dt>
+            <dd>{template.subcategoria}</dd>
           </div>
           <div>
             <dt>Archivos</dt>

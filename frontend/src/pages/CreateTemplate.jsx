@@ -16,6 +16,27 @@ const emptyFile = () => ({
   content: "",
 });
 
+const fileTypes = [
+  { value: "js", label: "JavaScript" },
+  { value: "jsx", label: "JSX" },
+  { value: "ts", label: "TypeScript" },
+  { value: "tsx", label: "TSX" },
+  { value: "css", label: "CSS" },
+  { value: "html", label: "HTML" },
+  { value: "json", label: "JSON" },
+  { value: "py", label: "Python" },
+  { value: "java", label: "Java" },
+  { value: "c", label: "C" },
+  { value: "cpp", label: "C++" },
+  { value: "h", label: "Header C/C++" },
+  { value: "cs", label: "C#" },
+  { value: "sql", label: "SQL" },
+  { value: "md", label: "Markdown" },
+  { value: "yaml", label: "YAML" },
+  { value: "xml", label: "XML" },
+  { value: "sh", label: "Shell" },
+];
+
 function validateForm({
   nombre,
   descripcion,
@@ -78,17 +99,43 @@ function validateForm({
   return errors;
 }
 
-function CreateTemplate() {
+export function TemplateForm({
+  initialTemplate = null,
+  submitTemplate,
+  loading,
+  error,
+  isEditing = false,
+}) {
   const navigate = useNavigate();
-  const { create, loading, error } = useCreateTemplate();
-  const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [lenguaje, setLenguaje] = useState("JavaScript");
-  const [categoria, setCategoria] = useState("Backend");
-  const [subcategoria, setSubcategoria] = useState("controllers");
+  const [nombre, setNombre] = useState(initialTemplate?.nombre ?? "");
+  const [descripcion, setDescripcion] = useState(
+    initialTemplate?.descripcion ?? "",
+  );
+  const [lenguaje, setLenguaje] = useState(
+    initialTemplate?.lenguaje ?? "JavaScript",
+  );
+  const [categoria, setCategoria] = useState(
+    initialTemplate?.categoria ?? "Backend",
+  );
+  const [subcategoria, setSubcategoria] = useState(
+    initialTemplate?.subcategoria ?? "controllers",
+  );
   const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState([]);
-  const [files, setFiles] = useState([emptyFile()]);
+  const [tags, setTags] = useState(initialTemplate?.tags ?? []);
+  const [files, setFiles] = useState(() => {
+    const initialFiles = initialTemplate?.templateFiles ?? [];
+
+    if (initialFiles.length === 0) {
+      return [emptyFile()];
+    }
+
+    return initialFiles.map((file) => ({
+      id: `existing-${file.id}`,
+      fileName: file.fileName,
+      type: file.type,
+      content: file.content,
+    }));
+  });
   const [validationErrors, setValidationErrors] = useState({});
   const subcategoryOptions = getSubcategories(lenguaje, categoria);
 
@@ -177,7 +224,7 @@ function CreateTemplate() {
       return;
     }
 
-    const createdTemplate = await create({
+    const savedTemplate = await submitTemplate({
       nombre: nombre.trim(),
       descripcion: descripcion.trim(),
       lenguaje,
@@ -191,26 +238,36 @@ function CreateTemplate() {
       })),
     });
 
-    if (!createdTemplate) {
+    if (!savedTemplate) {
       return;
     }
 
     await Swal.fire({
       icon: "success",
-      title: "Template guardado",
-      text: "El template fue creado correctamente.",
+      title: isEditing ? "Template actualizado" : "Template guardado",
+      text: isEditing
+        ? "El template fue actualizado correctamente."
+        : "El template fue creado correctamente.",
       confirmButtonText: "Continuar",
       confirmButtonColor: "#3157d5",
     });
 
-    navigate(getTemplatePath(lenguaje, categoria, subcategoria));
+    navigate(
+      isEditing
+        ? `/templates/${initialTemplate.id}`
+        : getTemplatePath(lenguaje, categoria, subcategoria),
+    );
   };
 
   return (
     <main className="create-template-page">
       <header className="create-template-header">
-        <p className="create-template-header__eyebrow">Nuevo recurso</p>
-        <h1 className="create-template-header__title">Crear template</h1>
+        <p className="create-template-header__eyebrow">
+          {isEditing ? "Editar recurso" : "Nuevo recurso"}
+        </p>
+        <h1 className="create-template-header__title">
+          {isEditing ? "Editar template" : "Crear template"}
+        </h1>
         <p className="create-template-header__description">
           Define la información, etiquetas y archivos que formarán tu template.
         </p>
@@ -480,9 +537,11 @@ function CreateTemplate() {
                         }
                         aria-invalid={Boolean(fileError.type)}
                       >
-                        <option value="jsx">JSX</option>
-                        <option value="js">JavaScript</option>
-                        <option value="css">CSS</option>
+                        {fileTypes.map((fileType) => (
+                          <option value={fileType.value} key={fileType.value}>
+                            {fileType.label}
+                          </option>
+                        ))}
                       </select>
                       {fileError.type && (
                         <p className="template-form__error">{fileError.type}</p>
@@ -526,7 +585,9 @@ function CreateTemplate() {
           <button
             className="template-form__cancel-button"
             type="button"
-            onClick={() => navigate("/")}
+            onClick={() =>
+              navigate(isEditing ? `/templates/${initialTemplate.id}` : "/")
+            }
             disabled={loading}
           >
             Cancelar
@@ -536,11 +597,27 @@ function CreateTemplate() {
             type="submit"
             disabled={loading}
           >
-            {loading ? "Guardando..." : "Guardar template"}
+            {loading
+              ? "Guardando..."
+              : isEditing
+                ? "Actualizar template"
+                : "Guardar template"}
           </button>
         </div>
       </form>
     </main>
+  );
+}
+
+function CreateTemplate() {
+  const { create, loading, error } = useCreateTemplate();
+
+  return (
+    <TemplateForm
+      submitTemplate={create}
+      loading={loading}
+      error={error}
+    />
   );
 }
 

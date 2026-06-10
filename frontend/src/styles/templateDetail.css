@@ -5,12 +5,24 @@
 }
 
 .template-detail__back-button,
+.template-detail__edit-button,
 .template-detail__copy-button {
   min-height: 42px;
   padding: 0 18px;
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.template-detail__edit-button {
+  margin-left: 10px;
+  border: 0;
+  color: #ffffff;
+  background: #3157d5;
+}
+
+.template-detail__edit-button:hover {
+  background: #2748b8;
 }
 
 .template-detail__back-button {
@@ -181,6 +193,7 @@
 
 .template-detail-tab:focus-visible,
 .template-detail__back-button:focus-visible,
+.template-detail__edit-button:focus-visible,
 .template-detail__copy-button:focus-visible {
   outline: 3px solid rgb(49 87 213 / 25%);
   outline-offset: 2px;
