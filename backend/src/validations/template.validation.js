@@ -68,6 +68,7 @@ export const templateQueryValidation = Joi.object({
 export const templateFiltersValidation = Joi.object({
   lenguaje: Joi.string().trim(),
   categoria: Joi.string().trim(),
+  subcategoria: Joi.string().trim(),
 })
   .unknown(false)
   .messages({
@@ -78,6 +79,7 @@ export const templateCreateValidation = Joi.object({
   nombre: nombre.required().messages({ "any.required": "El nombre es obligatorio." }),
   lenguaje: Joi.string().required(),
   categoria: Joi.string().required(),
+  subcategoria: Joi.string().required(),
   descripcion: descripcion.required().messages({ "any.required": "La descripción es obligatoria." }),
   tags: tags.required().messages({ "any.required": "Las etiquetas son obligatorias." }),
   files: files.required().messages({ "any.required": "Los archivos son obligatorios." }),

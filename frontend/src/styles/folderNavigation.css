@@ -95,6 +95,10 @@
   font-size: 1.08rem;
 }
 
+.folder-card__title--capitalize {
+  text-transform: capitalize;
+}
+
 .folder-card__description {
   margin-top: 6px;
   color: #718096;

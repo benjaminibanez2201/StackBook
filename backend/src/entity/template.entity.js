@@ -27,6 +27,10 @@ const TemplateSchema = new EntitySchema({
       type: "varchar",
       nullable: false,
     },
+    subcategoria: {
+      type: "varchar",
+      nullable: false,
+    },
 
     tags: {
         type: "simple-array",

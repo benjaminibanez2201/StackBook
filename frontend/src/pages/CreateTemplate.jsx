@@ -2,7 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import useCreateTemplate from "../hooks/templates/useCreateTemplate.js";
-import { getTemplatePath } from "../utils/templateNavigation.js";
+import {
+  getSubcategories,
+  getTemplatePath,
+  languages,
+} from "../utils/templateNavigation.js";
 import "../styles/createTemplate.css";
 
 const emptyFile = () => ({
@@ -17,6 +21,7 @@ function validateForm({
   descripcion,
   lenguaje,
   categoria,
+  subcategoria,
   tags,
   files,
 }) {
@@ -40,6 +45,16 @@ function validateForm({
 
   if (!categoria) {
     errors.categoria = "La categoría es obligatoria.";
+  }
+
+  if (!subcategoria.trim()) {
+    errors.subcategoria = "La subcategoría es obligatoria.";
+  } else if (
+    !getSubcategories(lenguaje, categoria).includes(
+      subcategoria.trim().toLowerCase(),
+    )
+  ) {
+    errors.subcategoria = "Selecciona una subcategoría válida.";
   }
 
   if (tags.length === 0) {
@@ -70,10 +85,12 @@ function CreateTemplate() {
   const [descripcion, setDescripcion] = useState("");
   const [lenguaje, setLenguaje] = useState("JavaScript");
   const [categoria, setCategoria] = useState("Backend");
+  const [subcategoria, setSubcategoria] = useState("controllers");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const [files, setFiles] = useState([emptyFile()]);
   const [validationErrors, setValidationErrors] = useState({});
+  const subcategoryOptions = getSubcategories(lenguaje, categoria);
 
   const addTag = () => {
     const newTag = tagInput.trim();
@@ -124,8 +141,21 @@ function CreateTemplate() {
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
+    const selectedCategory =
+      selectedLanguage === "JavaScript" ? "Backend" : "General";
     setLenguaje(selectedLanguage);
-    setCategoria(selectedLanguage === "JavaScript" ? "Backend" : "General");
+    setCategoria(selectedCategory);
+    setSubcategoria(
+      getSubcategories(selectedLanguage, selectedCategory)[0] ?? "general",
+    );
+  };
+
+  const handleCategoryChange = (event) => {
+    const selectedCategory = event.target.value;
+    setCategoria(selectedCategory);
+    setSubcategoria(
+      getSubcategories(lenguaje, selectedCategory)[0] ?? "general",
+    );
   };
 
   const handleSubmit = async (event) => {
@@ -136,6 +166,7 @@ function CreateTemplate() {
       descripcion,
       lenguaje,
       categoria,
+      subcategoria,
       tags,
       files,
     };
@@ -151,6 +182,7 @@ function CreateTemplate() {
       descripcion: descripcion.trim(),
       lenguaje,
       categoria,
+      subcategoria: subcategoria.trim().toLowerCase(),
       tags,
       files: files.map(({ fileName, type, content }) => ({
         fileName: fileName.trim(),
@@ -171,7 +203,7 @@ function CreateTemplate() {
       confirmButtonColor: "#3157d5",
     });
 
-    navigate(getTemplatePath(lenguaje, categoria));
+    navigate(getTemplatePath(lenguaje, categoria, subcategoria));
   };
 
   return (
@@ -250,11 +282,11 @@ function CreateTemplate() {
                 required
                 aria-invalid={Boolean(validationErrors.lenguaje)}
               >
-                <option value="JavaScript">JavaScript</option>
-                <option value="Python">Python</option>
-                <option value="Java">Java</option>
-                <option value="C++">C++</option>
-                <option value="C#">C#</option>
+                {languages.map((language) => (
+                  <option value={language.name} key={language.slug}>
+                    {language.name}
+                  </option>
+                ))}
               </select>
               {validationErrors.lenguaje && (
                 <p className="template-form__error">
@@ -269,7 +301,7 @@ function CreateTemplate() {
                 id="categoria"
                 name="categoria"
                 value={categoria}
-                onChange={(event) => setCategoria(event.target.value)}
+                onChange={handleCategoryChange}
                 required
                 aria-invalid={Boolean(validationErrors.categoria)}
               >
@@ -289,6 +321,33 @@ function CreateTemplate() {
               )}
             </div>
           </div>
+
+          {lenguaje === "JavaScript" && (
+            <div className="template-form__field template-form__subcategory">
+              <label htmlFor="subcategoria">Subcategoría</label>
+              <input
+                id="subcategoria"
+                name="subcategoria"
+                type="text"
+                list="subcategorias"
+                value={subcategoria}
+                onChange={(event) => setSubcategoria(event.target.value)}
+                required
+                aria-invalid={Boolean(validationErrors.subcategoria)}
+                placeholder="Selecciona o escribe una subcategoría"
+              />
+              <datalist id="subcategorias">
+                {subcategoryOptions.map((option) => (
+                  <option value={option} key={option} />
+                ))}
+              </datalist>
+              {validationErrors.subcategoria && (
+                <p className="template-form__error">
+                  {validationErrors.subcategoria}
+                </p>
+              )}
+            </div>
+          )}
         </section>
 
         <section className="template-form__section">

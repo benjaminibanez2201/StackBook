@@ -6,6 +6,7 @@ import { deleteTemplate } from "../services/template.service.js";
 import {
   getCategoryBySlug,
   getLanguageBySlug,
+  getSubcategoryBySlug,
 } from "../utils/templateNavigation.js";
 import "../styles/templates.css";
 
@@ -107,24 +108,33 @@ function TemplateCard({ template, onDeleted }) {
 }
 
 function Templates() {
-  const { lenguaje, categoria } = useParams();
+  const { lenguaje, categoria, subcategoria } = useParams();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const language = getLanguageBySlug(lenguaje);
   const category = getCategoryBySlug(language, categoria);
+  const validSubcategory = getSubcategoryBySlug(
+    language,
+    category,
+    subcategoria,
+  );
   const { templates, loading, error, refetch } = useGetTemplates({
     lenguaje: language?.name,
     categoria: category?.name,
+    subcategoria: validSubcategory,
   });
   const filteredTemplates = templates.filter((template) =>
     template.nombre.toLowerCase().includes(search.trim().toLowerCase()),
   );
 
-  if (!language || !category) {
+  if (!language || !category || !validSubcategory) {
     return <Navigate to="/" replace />;
   }
 
-  const backPath = language.name === "JavaScript" ? `/${language.slug}` : "/";
+  const backPath =
+    language.name === "JavaScript"
+      ? `/${language.slug}/${category.slug}`
+      : "/";
 
   return (
     <main className="templates-page">
@@ -138,10 +148,10 @@ function Templates() {
             Volver
           </button>
           <p className="templates-header__eyebrow">
-            {language.name} / {category.name}
+            {language.name} / {category.name} / {validSubcategory}
           </p>
           <h1 className="templates-header__title">
-            Templates de {category.name}
+            Templates de {validSubcategory}
           </h1>
           <p className="templates-header__description">
             Explora los templates disponibles en esta carpeta.

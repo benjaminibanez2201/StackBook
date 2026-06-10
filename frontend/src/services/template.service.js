@@ -5,8 +5,14 @@ export async function createTemplate(data) {
   return response.data;
 }
 
-export async function getTemplates(params = {}) {
-  const response = await axios.get("/templates", { params });
+export async function getTemplates({
+  lenguaje,
+  categoria,
+  subcategoria,
+} = {}) {
+  const response = await axios.get("/templates", {
+    params: { lenguaje, categoria, subcategoria },
+  });
   return response.data;
 }
 

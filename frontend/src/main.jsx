@@ -18,7 +18,11 @@ createRoot(document.getElementById("root")).render(
         <Route path="/create" element={<CreateTemplate />} />
         <Route path="/templates/:id" element={<TemplateDetail />} />
         <Route path="/:lenguaje" element={<Categories />} />
-        <Route path="/:lenguaje/:categoria" element={<Templates />} />
+        <Route path="/:lenguaje/:categoria" element={<Categories />} />
+        <Route
+          path="/:lenguaje/:categoria/:subcategoria"
+          element={<Templates />}
+        />
       </Routes>
     </BrowserRouter>
   </StrictMode>

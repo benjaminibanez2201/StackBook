@@ -154,6 +154,10 @@
   margin-top: 0;
 }
 
+.template-form__subcategory {
+  margin-top: 22px;
+}
+
 .template-form__secondary-button,
 .template-form__cancel-button,
 .template-form__submit-button {

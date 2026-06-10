@@ -1,56 +1,83 @@
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import {
+  getCategoryBySlug,
   getLanguageBySlug,
+  getSubcategories,
   javascriptCategories,
 } from "../utils/templateNavigation.js";
 import "../styles/folderNavigation.css";
 
 function Categories() {
-  const { lenguaje } = useParams();
+  const { lenguaje, categoria } = useParams();
   const navigate = useNavigate();
   const language = getLanguageBySlug(lenguaje);
+  const category = getCategoryBySlug(language, categoria);
 
   if (!language) {
     return <Navigate to="/" replace />;
   }
 
-  if (language.name !== "JavaScript") {
-    return <Navigate to={`/${language.slug}/general`} replace />;
+  if (categoria && !category) {
+    return <Navigate to={`/${language.slug}`} replace />;
   }
+
+  if (language.name !== "JavaScript") {
+    return <Navigate to={`/${language.slug}/general/general`} replace />;
+  }
+
+  const items = category
+    ? getSubcategories(language.name, category.name).map((subcategory) => ({
+        name: subcategory,
+        slug: subcategory,
+      }))
+    : javascriptCategories;
+  const backPath = category ? `/${language.slug}` : "/";
 
   return (
     <main className="folder-page">
       <button
         className="folder-back-button"
         type="button"
-        onClick={() => navigate("/")}
+        onClick={() => navigate(backPath)}
       >
         Volver
       </button>
 
       <header className="folder-header">
-        <p className="folder-header__eyebrow">{language.name}</p>
-        <h1 className="folder-header__title">Categorías</h1>
+        <p className="folder-header__eyebrow">
+          {category ? `${language.name} / ${category.name}` : language.name}
+        </p>
+        <h1 className="folder-header__title">
+          {category ? "Subcategorías" : "Categorías"}
+        </h1>
         <p className="folder-header__description">
-          Selecciona el tipo de proyecto que quieres explorar.
+          Selecciona la carpeta que quieres explorar.
         </p>
       </header>
 
-      <section className="folder-grid" aria-label="Categorías disponibles">
-        {javascriptCategories.map((category) => (
+      <section className="folder-grid" aria-label="Carpetas disponibles">
+        {items.map((item) => (
           <button
             className="folder-card"
             type="button"
-            key={category.slug}
-            onClick={() => navigate(`/${language.slug}/${category.slug}`)}
+            key={item.slug}
+            onClick={() =>
+              navigate(
+                category
+                  ? `/${language.slug}/${category.slug}/${item.slug}`
+                  : `/${language.slug}/${item.slug}`,
+              )
+            }
           >
             <span className="folder-card__icon" aria-hidden="true">
-              {category.name.slice(0, 2)}
+              {item.name.slice(0, 2)}
             </span>
             <span>
-              <strong className="folder-card__title">{category.name}</strong>
+              <strong className="folder-card__title folder-card__title--capitalize">
+                {item.name}
+              </strong>
               <span className="folder-card__description">
-                Ver templates de {category.name.toLowerCase()}
+                {category ? "Ver templates" : "Explorar subcategorías"}
               </span>
             </span>
             <span className="folder-card__arrow" aria-hidden="true">
