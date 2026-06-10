@@ -75,6 +75,14 @@ export const templateFiltersValidation = Joi.object({
     "object.unknown": "No se permiten filtros adicionales.",
   });
 
+export const templateSearchValidation = Joi.object({
+  q: Joi.string().trim().min(1).required(),
+})
+  .unknown(false)
+  .messages({
+    "object.unknown": "No se permiten parámetros adicionales.",
+  });
+
 export const templateCreateValidation = Joi.object({
   nombre: nombre.required().messages({ "any.required": "El nombre es obligatorio." }),
   lenguaje: Joi.string().required(),

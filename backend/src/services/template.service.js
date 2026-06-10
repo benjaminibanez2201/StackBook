@@ -47,6 +47,26 @@ export async function getTemplates({ lenguaje, categoria, subcategoria } = {}) {
   }
 }
 
+export async function searchTemplates(query) {
+  try {
+    const searchQuery = `%${query}%`;
+    const templates = await templateRepository
+      .createQueryBuilder("template")
+      .where("template.nombre ILIKE :query", { query: searchQuery })
+      .orWhere("template.tags ILIKE :query", { query: searchQuery })
+      .orWhere("template.lenguaje ILIKE :query", { query: searchQuery })
+      .orWhere("template.categoria ILIKE :query", { query: searchQuery })
+      .orWhere("template.subcategoria ILIKE :query", { query: searchQuery })
+      .orderBy("template.createdAt", "DESC")
+      .getMany();
+
+    return [templates, null];
+  } catch (error) {
+    console.error("Error al buscar templates:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
 export async function getTemplateById(id) {
   try {
     const templateFound = await templateRepository.findOne({

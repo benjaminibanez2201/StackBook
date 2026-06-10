@@ -4,12 +4,14 @@ import {
   getTemplateById as getTemplateByIdService,
   getTemplateFiles as getTemplateFilesService,
   getTemplates as getTemplatesService,
+  searchTemplates as searchTemplatesService,
   deleteTemplate as deleteTemplateService,
 } from "../services/template.service.js";
 import {
   templateCreateValidation,
   templateFiltersValidation,
   templateQueryValidation,
+  templateSearchValidation,
 } from "../validations/template.validation.js";
 import {
   handleErrorClient,
@@ -55,6 +57,27 @@ export async function getTemplates(req, res) {
     return handleSuccess(res, 200, "Templates encontrados", templates);
   } catch (error) {
     console.error("Error en template.controller -> getTemplates():", error);
+    return handleErrorServer(res, 500, "Error interno del servidor");
+  }
+}
+
+export async function searchTemplates(req, res) {
+  try {
+    const { error, value } = templateSearchValidation.validate(req.query);
+
+    if (error) {
+      return handleErrorClient(res, 400, "Error de validacion", error.message);
+    }
+
+    const [templates, serviceError] = await searchTemplatesService(value.q);
+
+    if (serviceError) {
+      return handleErrorServer(res, 500, serviceError);
+    }
+
+    return handleSuccess(res, 200, "Templates encontrados", templates);
+  } catch (error) {
+    console.error("Error en template.controller -> searchTemplates():", error);
     return handleErrorServer(res, 500, "Error interno del servidor");
   }
 }
