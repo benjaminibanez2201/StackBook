@@ -16,6 +16,13 @@ export async function getTemplates({
   return response.data;
 }
 
+export async function searchTemplates(query) {
+  const response = await axios.get("/templates/search", {
+    params: { q: query },
+  });
+  return response.data;
+}
+
 export async function getTemplateById(id) {
   const response = await axios.get(`/templates/${id}`);
   return response.data;
