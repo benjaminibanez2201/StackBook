@@ -77,11 +77,13 @@
   height: 52px;
   place-items: center;
   border-radius: 13px;
-  color: #3157d5;
   background: #edf1ff;
-  font-size: 0.82rem;
-  font-weight: 800;
-  text-transform: uppercase;
+}
+
+.folder-card__icon img {
+  display: block;
+  width: 40px;
+  height: 40px;
 }
 
 .folder-card__title,

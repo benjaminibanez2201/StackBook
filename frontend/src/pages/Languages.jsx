@@ -23,8 +23,13 @@ function Languages() {
             key={language.slug}
             onClick={() => navigate(`/${language.slug}`)}
           >
-            <span className="folder-card__icon" aria-hidden="true">
-              {language.name.slice(0, 2)}
+            <span className="folder-card__icon">
+              <img
+                src={`https://skillicons.dev/icons?i=${language.icon}`}
+                alt={`Icono de ${language.name}`}
+                width="40"
+                height="40"
+              />
             </span>
             <span>
               <strong className="folder-card__title">{language.name}</strong>

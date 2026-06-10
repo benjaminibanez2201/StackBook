@@ -1,9 +1,10 @@
 export const languages = [
-  { name: "JavaScript", slug: "javascript" },
-  { name: "Python", slug: "python" },
-  { name: "Java", slug: "java" },
-  { name: "C++", slug: "cpp" },
-  { name: "C#", slug: "csharp" },
+  { name: "JavaScript", slug: "javascript", icon: "javascript" },
+  { name: "Python", slug: "python", icon: "python" },
+  { name: "Java", slug: "java", icon: "java" },
+  { name: "C++", slug: "cpp", icon: "cpp" },
+  { name: "C#", slug: "csharp", icon: "cs" },
+  { name: "SQL", slug: "sql", icon: "postgres" },
 ];
 
 export const javascriptCategories = [
