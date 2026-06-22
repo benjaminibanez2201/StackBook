@@ -165,7 +165,9 @@ function Languages() {
         {languages.map((language) => {
           const total = counts.reduce(
             (sum, count) =>
-              count.lenguaje === language.name ? sum + count.total : sum,
+              count.lenguaje.toLowerCase() === language.name.toLowerCase()
+                ? sum + count.total
+                : sum,
             0,
           );
 

@@ -81,11 +81,13 @@ function Categories() {
       <section className="folder-grid" aria-label="Carpetas disponibles">
         {items.map((item) => {
           const total = counts.reduce((sum, count) => {
-            const matchesLanguage = count.lenguaje === language.name;
+            const matchesLanguage =
+              count.lenguaje.toLowerCase() === language.name.toLowerCase();
             const matchesFolder = category
-              ? count.categoria === category.name &&
-                count.subcategoria === item.name
-              : count.categoria === item.name;
+              ? count.categoria.toLowerCase() ===
+                  category.name.toLowerCase() &&
+                count.subcategoria.toLowerCase() === item.name.toLowerCase()
+              : count.categoria.toLowerCase() === item.name.toLowerCase();
 
             return matchesLanguage && matchesFolder ? sum + count.total : sum;
           }, 0);
