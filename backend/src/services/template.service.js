@@ -67,6 +67,40 @@ export async function searchTemplates(query) {
   }
 }
 
+export async function buscarSnippetsPorTexto(query) {
+  try {
+    const searchQuery = `%${query}%`;
+    const template = await templateRepository
+      .createQueryBuilder("template")
+      .leftJoinAndSelect("template.templateFiles", "templateFile")
+      .where("template.nombre ILIKE :query", { query: searchQuery })
+      .orWhere("template.categoria ILIKE :query", { query: searchQuery })
+      .orWhere("templateFile.content ILIKE :query", { query: searchQuery })
+      .orderBy("template.createdAt", "DESC")
+      .addOrderBy("templateFile.id", "ASC")
+      .getOne();
+
+    if (!template) return [null, null];
+
+    const matchingFile =
+      template.templateFiles?.find((file) =>
+        file.content.toLowerCase().includes(query.toLowerCase()),
+      ) ?? template.templateFiles?.[0];
+
+    return [
+      {
+        titulo: template.nombre,
+        codigo: matchingFile?.content ?? "",
+        lenguaje: template.lenguaje,
+      },
+      null,
+    ];
+  } catch (error) {
+    console.error("Error al buscar snippets por texto:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
 export async function getTemplateById(id) {
   try {
     const templateFound = await templateRepository.findOne({
@@ -155,11 +189,11 @@ export async function deleteTemplate(id) {
       const templateFound = await templateRepository.findOne({
         where: { id },
       });
-  
+
       if (!templateFound) return [null, "Template no encontrado"];
-  
+
       await templateRepository.remove(templateFound);
-  
+
       return [{ message: "Template eliminado correctamente" }, null];
     } catch (error) {
       console.error("Error al eliminar el template:", error);
