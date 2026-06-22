@@ -38,6 +38,11 @@ export async function updateTemplate(id, data) {
   return response.data;
 }
 
+export async function moveTemplateToFolder(id, data) {
+  const response = await axios.patch(`/templates/${id}/move`, data);
+  return response.data;
+}
+
 export async function deleteTemplate(id) {
   const response = await axios.delete(`/templates/${id}`);
   return response.data;
