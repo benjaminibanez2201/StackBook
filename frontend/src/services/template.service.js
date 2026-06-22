@@ -23,6 +23,11 @@ export async function searchTemplates(query) {
   return response.data;
 }
 
+export async function getTemplateCounts() {
+  const response = await axios.get("/templates/counts");
+  return response.data;
+}
+
 export async function getTemplateById(id) {
   const response = await axios.get(`/templates/${id}`);
   return response.data;
