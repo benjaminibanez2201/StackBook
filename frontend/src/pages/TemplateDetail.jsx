@@ -51,7 +51,7 @@ function TemplateDetail() {
     template?.subcategoria ??
     "general";
   const currentMoveSelection =
-    moveSelection?.templateId === template?.id
+    moveSelection && template && moveSelection.templateId === template.id
       ? moveSelection
       : {
           templateId: template?.id,
