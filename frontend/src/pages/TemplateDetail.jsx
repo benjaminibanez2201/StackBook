@@ -3,6 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import CodeBlock from "../components/CodeBlock.jsx";
 import useGetTemplate from "../hooks/templates/useGetTemplate.js";
+import { moveTemplateToFolder } from "../services/template.service.js";
+import {
+  getSubcategories,
+  getTemplatePath,
+  javascriptCategories,
+  languages,
+} from "../utils/templateNavigation.js";
 import "../styles/templateDetail.css";
 
 function TemplateDetail() {
@@ -10,9 +17,29 @@ function TemplateDetail() {
   const navigate = useNavigate();
   const { template, loading, error } = useGetTemplate(id);
   const [activeFileIndex, setActiveFileIndex] = useState(0);
+  const [isMovePanelOpen, setIsMovePanelOpen] = useState(false);
+  const [moveSelection, setMoveSelection] = useState(null);
+  const [moving, setMoving] = useState(false);
 
   const files = template?.templateFiles ?? [];
   const activeFile = files[activeFileIndex] ?? files[0];
+  const currentMoveSelection =
+    moveSelection?.templateId === template?.id
+      ? moveSelection
+      : {
+          templateId: template?.id,
+          lenguaje: template?.lenguaje ?? "JavaScript",
+          categoria: template?.categoria ?? "Backend",
+          subcategoria: template?.subcategoria ?? "controllers",
+        };
+  const moveCategories =
+    currentMoveSelection.lenguaje === "JavaScript"
+      ? javascriptCategories
+      : [{ name: "General", slug: "general" }];
+  const moveSubcategories = getSubcategories(
+    currentMoveSelection.lenguaje,
+    currentMoveSelection.categoria,
+  );
 
   const copyActiveFile = async () => {
     if (!activeFile) {
@@ -36,6 +63,77 @@ function TemplateDetail() {
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#3157d5",
       });
+    }
+  };
+
+  const handleMoveLanguageChange = (event) => {
+    const nextLanguage = event.target.value;
+    const nextCategory = nextLanguage === "JavaScript" ? "Backend" : "General";
+    const nextSubcategory =
+      getSubcategories(nextLanguage, nextCategory)[0] ?? "general";
+
+    setMoveSelection({
+      templateId: template?.id,
+      lenguaje: nextLanguage,
+      categoria: nextCategory,
+      subcategoria: nextSubcategory,
+    });
+  };
+
+  const handleMoveCategoryChange = (event) => {
+    const nextCategory = event.target.value;
+    const nextSubcategory =
+      getSubcategories(currentMoveSelection.lenguaje, nextCategory)[0] ??
+      "general";
+
+    setMoveSelection({
+      ...currentMoveSelection,
+      categoria: nextCategory,
+      subcategoria: nextSubcategory,
+    });
+  };
+
+  const handleMoveTemplate = async (event) => {
+    event.preventDefault();
+
+    if (!template) {
+      return;
+    }
+
+    setMoving(true);
+
+    try {
+      await moveTemplateToFolder(template.id, {
+        lenguaje: currentMoveSelection.lenguaje,
+        categoria: currentMoveSelection.categoria,
+        subcategoria: currentMoveSelection.subcategoria,
+      });
+
+      await Swal.fire({
+        icon: "success",
+        title: "Template movido",
+        text: "El template fue movido correctamente.",
+        confirmButtonText: "Continuar",
+        confirmButtonColor: "#3157d5",
+      });
+
+      navigate(
+        getTemplatePath(
+          currentMoveSelection.lenguaje,
+          currentMoveSelection.categoria,
+          currentMoveSelection.subcategoria,
+        ),
+      );
+    } catch {
+      await Swal.fire({
+        icon: "error",
+        title: "No se pudo mover",
+        text: "Intentalo nuevamente en unos segundos.",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#3157d5",
+      });
+    } finally {
+      setMoving(false);
     }
   };
 
@@ -68,20 +166,95 @@ function TemplateDetail() {
 
   return (
     <main className="template-detail-page">
-      <button
-        className="template-detail__back-button"
-        type="button"
-        onClick={() => navigate("/")}
-      >
-        Volver
-      </button>
-      <button
-        className="template-detail__edit-button"
-        type="button"
-        onClick={() => navigate(`/templates/${template.id}/edit`)}
-      >
-        Editar template
-      </button>
+      <div className="template-detail-actions">
+        <button
+          className="template-detail__back-button"
+          type="button"
+          onClick={() => navigate("/")}
+        >
+          Volver
+        </button>
+        <button
+          className="template-detail__edit-button"
+          type="button"
+          onClick={() => navigate(`/templates/${template.id}/edit`)}
+        >
+          Editar template
+        </button>
+        <button
+          className="template-detail__move-button"
+          type="button"
+          onClick={() => setIsMovePanelOpen((current) => !current)}
+          aria-expanded={isMovePanelOpen}
+        >
+          Mover
+        </button>
+      </div>
+
+      {isMovePanelOpen && (
+        <form className="template-detail-move" onSubmit={handleMoveTemplate}>
+          <div className="template-detail-move__field">
+            <label htmlFor="move-language">Lenguaje</label>
+            <select
+              id="move-language"
+              value={currentMoveSelection.lenguaje}
+              onChange={handleMoveLanguageChange}
+              disabled={moving}
+            >
+              {languages.map((language) => (
+                <option value={language.name} key={language.slug}>
+                  {language.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="template-detail-move__field">
+            <label htmlFor="move-category">Categoria</label>
+            <select
+              id="move-category"
+              value={currentMoveSelection.categoria}
+              onChange={handleMoveCategoryChange}
+              disabled={moving}
+            >
+              {moveCategories.map((category) => (
+                <option value={category.name} key={category.slug}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="template-detail-move__field">
+            <label htmlFor="move-subcategory">Subcategoria</label>
+            <select
+              id="move-subcategory"
+              value={currentMoveSelection.subcategoria}
+              onChange={(event) =>
+                setMoveSelection({
+                  ...currentMoveSelection,
+                  subcategoria: event.target.value,
+                })
+              }
+              disabled={moving}
+            >
+              {moveSubcategories.map((subcategory) => (
+                <option value={subcategory} key={subcategory}>
+                  {subcategory}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            className="template-detail-move__submit"
+            type="submit"
+            disabled={moving}
+          >
+            {moving ? "Moviendo..." : "Mover template"}
+          </button>
+        </form>
+      )}
 
       <header className="template-detail-header">
         <div className="template-detail-header__main">
