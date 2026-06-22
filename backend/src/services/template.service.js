@@ -27,18 +27,27 @@ export async function createTemplate(data) {
 
 export async function getTemplates({ lenguaje, categoria, subcategoria } = {}) {
   try {
-    const where = {};
+    const queryBuilder = templateRepository.createQueryBuilder("template");
 
-    if (lenguaje) where.lenguaje = lenguaje;
-    if (categoria) where.categoria = categoria;
-    if (subcategoria) where.subcategoria = subcategoria;
+    if (lenguaje) {
+      queryBuilder.andWhere("template.lenguaje ILIKE :lenguaje", { lenguaje });
+    }
 
-    const templates = await templateRepository.find({
-      where,
-      order: {
-        createdAt: "DESC",
-      },
-    });
+    if (categoria) {
+      queryBuilder.andWhere("template.categoria ILIKE :categoria", {
+        categoria,
+      });
+    }
+
+    if (subcategoria) {
+      queryBuilder.andWhere("template.subcategoria ILIKE :subcategoria", {
+        subcategoria,
+      });
+    }
+
+    const templates = await queryBuilder
+      .orderBy("template.createdAt", "DESC")
+      .getMany();
 
     return [templates, null];
   } catch (error) {
