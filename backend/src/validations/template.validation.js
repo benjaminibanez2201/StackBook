@@ -60,6 +60,25 @@ export const templateBodyValidation = Joi.object({
     "object.unknown": "No se permiten propiedades adicionales.",
     "object.missing":
       "Debes proporcionar al menos un campo para actualizar.",
+});
+
+export const templateMoveValidation = Joi.object({
+  lenguaje: Joi.string().trim().required().messages({
+    "any.required": "El lenguaje es obligatorio.",
+    "string.empty": "El lenguaje no puede estar vacio.",
+  }),
+  categoria: Joi.string().trim().required().messages({
+    "any.required": "La categoria es obligatoria.",
+    "string.empty": "La categoria no puede estar vacia.",
+  }),
+  subcategoria: Joi.string().trim().required().messages({
+    "any.required": "La subcategoria es obligatoria.",
+    "string.empty": "La subcategoria no puede estar vacia.",
+  }),
+})
+  .unknown(false)
+  .messages({
+    "object.unknown": "No se permiten propiedades adicionales.",
   });
 
 export const templateQueryValidation = Joi.object({

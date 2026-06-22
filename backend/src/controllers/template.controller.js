@@ -5,6 +5,7 @@ import {
   getTemplateFiles as getTemplateFilesService,
   getTemplates as getTemplatesService,
   getTemplateCounts as getTemplateCountsService,
+  moveTemplateToFolder as moveTemplateToFolderService,
   searchTemplates as searchTemplatesService,
   updateTemplate as updateTemplateService,
   deleteTemplate as deleteTemplateService,
@@ -13,6 +14,7 @@ import {
   templateBodyValidation,
   templateCreateValidation,
   templateFiltersValidation,
+  templateMoveValidation,
   templateQueryValidation,
   templateSearchValidation,
 } from "../validations/template.validation.js";
@@ -181,6 +183,40 @@ export async function updateTemplate(req, res) {
     );
   } catch (error) {
     console.error("Error en template.controller -> updateTemplate():", error);
+    return handleErrorServer(res, 500, "Error interno del servidor");
+  }
+}
+
+export async function moveTemplateToFolder(req, res) {
+  try {
+    const { error: paramsError } = templateQueryValidation.validate(req.params);
+    const { error: bodyError, value } = templateMoveValidation.validate(req.body);
+
+    if (paramsError || bodyError) {
+      return handleErrorClient(
+        res,
+        400,
+        "Error de validacion",
+        paramsError?.message ?? bodyError.message,
+      );
+    }
+
+    const [template, serviceError] = await moveTemplateToFolderService(
+      Number(req.params.id),
+      value,
+    );
+
+    if (serviceError === "Template no encontrado") {
+      return handleErrorClient(res, 404, serviceError);
+    }
+
+    if (serviceError) {
+      return handleErrorServer(res, 500, serviceError);
+    }
+
+    return handleSuccess(res, 200, "Template movido correctamente", template);
+  } catch (error) {
+    console.error("Error en template.controller -> moveTemplateToFolder():", error);
     return handleErrorServer(res, 500, "Error interno del servidor");
   }
 }

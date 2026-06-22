@@ -7,6 +7,7 @@ import {
   getTemplateCounts,
   getTemplateFiles,
   getTemplates,
+  moveTemplateToFolder,
   searchTemplates,
   updateTemplate,
 } from "../controllers/template.controller.js";
@@ -19,6 +20,7 @@ router.get("/search", searchTemplates);
 router.get("/counts", getTemplateCounts);
 router.get("/:id", getTemplateById);
 router.get("/:id/files", getTemplateFiles);
+router.patch("/:id/move", moveTemplateToFolder);
 router.patch("/:id", updateTemplate);
 router.delete("/:id", deleteTemplate);
 
