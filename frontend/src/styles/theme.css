@@ -105,6 +105,7 @@ select {
 :root[data-theme="dark"] .template-form__section-heading h2,
 :root[data-theme="dark"] .template-form__field label,
 :root[data-theme="dark"] .template-file legend,
+:root[data-theme="dark"] .template-detail-move__field label,
 :root[data-theme="dark"] .template-detail-header__title,
 :root[data-theme="dark"] .template-detail-files__heading h2,
 :root[data-theme="dark"] .templates-search label {
@@ -132,6 +133,7 @@ select {
 :root[data-theme="dark"] .template-card,
 :root[data-theme="dark"] .templates-status,
 :root[data-theme="dark"] .template-form__section,
+:root[data-theme="dark"] .template-detail-move,
 :root[data-theme="dark"] .template-detail-header,
 :root[data-theme="dark"] .template-detail-files,
 :root[data-theme="dark"] .template-detail-status {
@@ -164,6 +166,7 @@ select {
 :root[data-theme="dark"] .folder-back-button,
 :root[data-theme="dark"] .templates-back-button,
 :root[data-theme="dark"] .template-detail__back-button,
+:root[data-theme="dark"] .template-detail__move-button,
 :root[data-theme="dark"] .template-form__secondary-button,
 :root[data-theme="dark"] .template-form__cancel-button {
   border-color: var(--theme-border-strong);
@@ -174,6 +177,7 @@ select {
 :root[data-theme="dark"] .folder-back-button:hover,
 :root[data-theme="dark"] .templates-back-button:hover,
 :root[data-theme="dark"] .template-detail__back-button:hover,
+:root[data-theme="dark"] .template-detail__move-button:hover,
 :root[data-theme="dark"] .template-form__secondary-button:hover {
   background: var(--theme-surface-soft);
 }
@@ -181,7 +185,8 @@ select {
 :root[data-theme="dark"] .templates-search input,
 :root[data-theme="dark"] .template-form__field input,
 :root[data-theme="dark"] .template-form__field textarea,
-:root[data-theme="dark"] .template-form__field select {
+:root[data-theme="dark"] .template-form__field select,
+:root[data-theme="dark"] .template-detail-move__field select {
   border-color: var(--theme-border-strong);
   color: var(--theme-text);
   background: var(--theme-surface-soft);

@@ -24,31 +24,31 @@
 .template-detail__edit-button {
   border: 0;
   color: #ffffff;
-  background: #3157d5;
+  background: var(--theme-primary);
 }
 
 .template-detail__edit-button:hover {
-  background: #2748b8;
+  background: var(--theme-primary-hover);
 }
 
 .template-detail__move-button {
-  border: 1px solid #c4cef8;
-  color: #3157d5;
-  background: #edf1ff;
+  border: 1px solid var(--theme-border-strong);
+  color: var(--theme-primary-text);
+  background: var(--theme-primary-soft);
 }
 
 .template-detail__move-button:hover {
-  background: #dfe6ff;
+  border-color: var(--theme-primary);
 }
 
 .template-detail__back-button {
-  border: 1px solid #c9d3e3;
-  color: #445269;
-  background: #ffffff;
+  border: 1px solid var(--theme-border-strong);
+  color: var(--theme-text-soft);
+  background: var(--theme-surface);
 }
 
 .template-detail__back-button:hover {
-  background: #f5f7fb;
+  background: var(--theme-surface-soft);
 }
 
 .template-detail-move {
@@ -58,10 +58,11 @@
   gap: 14px;
   margin-top: 18px;
   padding: 18px;
-  border: 1px solid #d7def0;
+  border: 1px solid var(--theme-border);
   border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgb(32 50 77 / 7%);
+  color: var(--theme-text);
+  background: var(--theme-surface);
+  box-shadow: var(--theme-shadow);
 }
 
 .template-detail-move__field {
@@ -70,7 +71,7 @@
 }
 
 .template-detail-move__field label {
-  color: #52627a;
+  color: var(--theme-text-muted);
   font-size: 0.76rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -79,10 +80,10 @@
 .template-detail-move__field select {
   min-height: 42px;
   padding: 0 12px;
-  border: 1px solid #c9d3e3;
+  border: 1px solid var(--theme-border-strong);
   border-radius: 10px;
-  color: #18212f;
-  background: #ffffff;
+  color: var(--theme-text);
+  background: var(--theme-surface-soft);
   font: inherit;
 }
 
@@ -92,13 +93,13 @@
   border: 0;
   border-radius: 10px;
   color: #ffffff;
-  background: #3157d5;
+  background: var(--theme-primary);
   font-weight: 800;
   cursor: pointer;
 }
 
 .template-detail-move__submit:hover:not(:disabled) {
-  background: #2748b8;
+  background: var(--theme-primary-hover);
 }
 
 .template-detail-move__submit:disabled {
