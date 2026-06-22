@@ -101,6 +101,34 @@ export async function buscarSnippetsPorTexto(query) {
   }
 }
 
+export async function getTemplateCounts() {
+  try {
+    const counts = await templateRepository
+      .createQueryBuilder("template")
+      .select("template.lenguaje", "lenguaje")
+      .addSelect("template.categoria", "categoria")
+      .addSelect("template.subcategoria", "subcategoria")
+      .addSelect("COUNT(template.id)", "total")
+      .groupBy("template.lenguaje")
+      .addGroupBy("template.categoria")
+      .addGroupBy("template.subcategoria")
+      .getRawMany();
+
+    return [
+      counts.map((count) => ({
+        lenguaje: count.lenguaje,
+        categoria: count.categoria,
+        subcategoria: count.subcategoria,
+        total: Number(count.total),
+      })),
+      null,
+    ];
+  } catch (error) {
+    console.error("Error al contar templates:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
 export async function getTemplateById(id) {
   try {
     const templateFound = await templateRepository.findOne({
