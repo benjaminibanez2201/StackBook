@@ -212,6 +212,27 @@ export async function updateTemplate(id, data) {
   }
 }
 
+export async function moveTemplateToFolder(id, data) {
+  try {
+    const templateFound = await templateRepository.findOne({
+      where: { id },
+    });
+
+    if (!templateFound) return [null, "Template no encontrado"];
+
+    templateFound.lenguaje = data.lenguaje;
+    templateFound.categoria = data.categoria;
+    templateFound.subcategoria = data.subcategoria;
+
+    const movedTemplate = await templateRepository.save(templateFound);
+
+    return [movedTemplate, null];
+  } catch (error) {
+    console.error("Error al mover el template:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
 export async function deleteTemplate(id) {
     try {
       const templateFound = await templateRepository.findOne({
