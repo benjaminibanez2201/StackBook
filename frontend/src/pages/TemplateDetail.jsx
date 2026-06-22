@@ -21,16 +21,43 @@ function TemplateDetail() {
   const [moveSelection, setMoveSelection] = useState(null);
   const [moving, setMoving] = useState(false);
 
-  const files = template?.templateFiles ?? [];
-  const activeFile = files[activeFileIndex] ?? files[0];
+  const files = Array.isArray(template?.templateFiles)
+    ? template.templateFiles
+    : [];
+  const tags = Array.isArray(template?.tags) ? template.tags : [];
+  const activeFile = files[activeFileIndex] ?? files[0] ?? null;
+  const templateLanguage =
+    languages.find(
+      (language) =>
+        language.name.toLowerCase() ===
+        String(template?.lenguaje ?? "").toLowerCase(),
+    )?.name ??
+    template?.lenguaje ??
+    "JavaScript";
+  const templateCategory =
+    templateLanguage === "JavaScript"
+      ? javascriptCategories.find(
+          (category) =>
+            category.name.toLowerCase() ===
+            String(template?.categoria ?? "").toLowerCase(),
+        )?.name ?? "Backend"
+      : "General";
+  const templateSubcategory =
+    getSubcategories(templateLanguage, templateCategory).find(
+      (subcategory) =>
+        subcategory.toLowerCase() ===
+        String(template?.subcategoria ?? "").toLowerCase(),
+    ) ??
+    template?.subcategoria ??
+    "general";
   const currentMoveSelection =
     moveSelection?.templateId === template?.id
       ? moveSelection
       : {
           templateId: template?.id,
-          lenguaje: template?.lenguaje ?? "JavaScript",
-          categoria: template?.categoria ?? "Backend",
-          subcategoria: template?.subcategoria ?? "controllers",
+          lenguaje: templateLanguage,
+          categoria: templateCategory,
+          subcategoria: templateSubcategory,
         };
   const moveCategories =
     currentMoveSelection.lenguaje === "JavaScript"
@@ -47,11 +74,11 @@ function TemplateDetail() {
     }
 
     try {
-      await navigator.clipboard.writeText(activeFile.content);
+      await navigator.clipboard.writeText(String(activeFile.content ?? ""));
       await Swal.fire({
         icon: "success",
         title: "Contenido copiado",
-        text: `${activeFile.fileName} fue copiado al portapapeles.`,
+        text: `${activeFile.fileName ?? "El archivo"} fue copiado al portapapeles.`,
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#3157d5",
       });
@@ -266,9 +293,9 @@ function TemplateDetail() {
             {template.descripcion}
           </p>
 
-          {template.tags?.length > 0 && (
+          {tags.length > 0 && (
             <div className="template-detail-tags" aria-label="Etiquetas">
-              {template.tags.map((tag) => (
+              {tags.map((tag) => (
                 <span className="template-detail-tag" key={tag}>
                   {tag}
                 </span>
@@ -280,15 +307,15 @@ function TemplateDetail() {
         <dl className="template-detail-meta">
           <div>
             <dt>Lenguaje</dt>
-            <dd>{template.lenguaje}</dd>
+            <dd>{template.lenguaje ?? "Sin lenguaje"}</dd>
           </div>
           <div>
             <dt>Categoría</dt>
-            <dd>{template.categoria}</dd>
+            <dd>{template.categoria ?? "Sin categoria"}</dd>
           </div>
           <div>
             <dt>Subcategoría</dt>
-            <dd>{template.subcategoria}</dd>
+            <dd>{template.subcategoria ?? "Sin subcategoria"}</dd>
           </div>
           <div>
             <dt>Archivos</dt>
@@ -330,16 +357,16 @@ function TemplateDetail() {
                     className={`template-detail-tab${
                       isActive ? " template-detail-tab--active" : ""
                     }`}
-                    id={`file-tab-${file.id}`}
-                    key={file.id}
+                    id={`file-tab-${file.id ?? index}`}
+                    key={file.id ?? index}
                     type="button"
                     role="tab"
                     aria-selected={isActive}
-                    aria-controls={`file-panel-${file.id}`}
+                    aria-controls={`file-panel-${file.id ?? index}`}
                     tabIndex={isActive ? 0 : -1}
                     onClick={() => setActiveFileIndex(index)}
                   >
-                    {file.fileName}
+                    {file.fileName ?? `Archivo ${index + 1}`}
                   </button>
                 );
               })}
@@ -347,9 +374,9 @@ function TemplateDetail() {
 
             <div
               className="template-detail-code"
-              id={`file-panel-${activeFile.id}`}
+              id={`file-panel-${activeFile.id ?? activeFileIndex}`}
               role="tabpanel"
-              aria-labelledby={`file-tab-${activeFile.id}`}
+              aria-labelledby={`file-tab-${activeFile.id ?? activeFileIndex}`}
             >
               <div className="template-detail-code__header">
                 <div className="template-detail-code__window">
@@ -358,13 +385,13 @@ function TemplateDetail() {
                   <span />
                 </div>
                 <span className="template-detail-code__filename">
-                  {activeFile.fileName}
+                  {activeFile.fileName ?? "archivo"}
                 </span>
                 <span className="template-detail-code__type">
-                  {activeFile.type.toUpperCase()}
+                  {String(activeFile.type ?? "txt").toUpperCase()}
                 </span>
               </div>
-              <CodeBlock content={activeFile.content} />
+              <CodeBlock content={String(activeFile.content ?? "")} />
             </div>
           </>
         )}
