@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { searchTemplates } from "../services/template.service.js";
+import {
+  getTemplateCounts,
+  searchTemplates,
+} from "../services/template.service.js";
 import { languages } from "../utils/templateNavigation.js";
 import "../styles/folderNavigation.css";
 import "../styles/languages.css";
@@ -12,6 +15,27 @@ function Languages() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [counts, setCounts] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getTemplateCounts()
+      .then((response) => {
+        if (!cancelled) {
+          setCounts(response.data);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCounts([]);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const normalizedQuery = query.trim();
@@ -138,32 +162,46 @@ function Languages() {
       </div>
 
       <section className="folder-grid" aria-label="Lenguajes disponibles">
-        {languages.map((language) => (
-          <button
-            className="folder-card"
-            type="button"
-            key={language.slug}
-            onClick={() => navigate(`/${language.slug}`)}
-          >
-            <span className="folder-card__icon">
-              <img
-                src={`https://skillicons.dev/icons?i=${language.icon}`}
-                alt={`Icono de ${language.name}`}
-                width="40"
-                height="40"
-              />
-            </span>
-            <span>
-              <strong className="folder-card__title">{language.name}</strong>
-              <span className="folder-card__description">
-                Explorar templates
+        {languages.map((language) => {
+          const total = counts.reduce(
+            (sum, count) =>
+              count.lenguaje === language.name ? sum + count.total : sum,
+            0,
+          );
+
+          return (
+            <button
+              className="folder-card"
+              type="button"
+              key={language.slug}
+              onClick={() => navigate(`/${language.slug}`)}
+            >
+              <span className="folder-card__icon">
+                <img
+                  src={`https://skillicons.dev/icons?i=${language.icon}`}
+                  alt={`Icono de ${language.name}`}
+                  width="40"
+                  height="40"
+                />
               </span>
-            </span>
-            <span className="folder-card__arrow" aria-hidden="true">
-              →
-            </span>
-          </button>
-        ))}
+              <span>
+                <strong className="folder-card__title">{language.name}</strong>
+                <span className="folder-card__description">
+                  Explorar templates
+                </span>
+              </span>
+              <span
+                className="folder-card__badge"
+                aria-label={`${total} templates`}
+              >
+                {total}
+              </span>
+              <span className="folder-card__arrow" aria-hidden="true">
+                →
+              </span>
+            </button>
+          );
+        })}
       </section>
     </main>
   );

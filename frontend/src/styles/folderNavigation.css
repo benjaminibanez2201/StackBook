@@ -42,7 +42,7 @@
 
 .folder-card {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 18px;
   min-height: 124px;
@@ -103,6 +103,18 @@
   margin-top: 6px;
   color: #718096;
   font-size: 0.86rem;
+}
+
+.folder-card__badge {
+  min-width: 34px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #1f3b8f;
+  background: #edf1ff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
 }
 
 .folder-card__arrow {
