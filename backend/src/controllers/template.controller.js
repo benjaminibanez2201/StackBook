@@ -4,6 +4,7 @@ import {
   getTemplateById as getTemplateByIdService,
   getTemplateFiles as getTemplateFilesService,
   getTemplates as getTemplatesService,
+  getTemplateCounts as getTemplateCountsService,
   searchTemplates as searchTemplatesService,
   updateTemplate as updateTemplateService,
   deleteTemplate as deleteTemplateService,
@@ -80,6 +81,21 @@ export async function searchTemplates(req, res) {
     return handleSuccess(res, 200, "Templates encontrados", templates);
   } catch (error) {
     console.error("Error en template.controller -> searchTemplates():", error);
+    return handleErrorServer(res, 500, "Error interno del servidor");
+  }
+}
+
+export async function getTemplateCounts(req, res) {
+  try {
+    const [counts, serviceError] = await getTemplateCountsService();
+
+    if (serviceError) {
+      return handleErrorServer(res, 500, serviceError);
+    }
+
+    return handleSuccess(res, 200, "Conteo de templates encontrado", counts);
+  } catch (error) {
+    console.error("Error en template.controller -> getTemplateCounts():", error);
     return handleErrorServer(res, 500, "Error interno del servidor");
   }
 }
@@ -172,19 +188,19 @@ export async function updateTemplate(req, res) {
 export async function deleteTemplate(req, res) {
     try {
       const { error } = templateQueryValidation.validate(req.params);
-  
+
       if (error) {
         return handleErrorClient(res, 400, "Error de validacion", error.message);
       }
-  
+
       const [result, serviceError] = await deleteTemplateService(
         Number(req.params.id),
       );
-  
+
       if (serviceError) {
         return handleErrorClient(res, 404, serviceError);
       }
-  
+
       return handleSuccess(res, 200, "Template eliminado correctamente", result);
     } catch (error) {
       console.error("Error en template.controller -> deleteTemplate():", error);

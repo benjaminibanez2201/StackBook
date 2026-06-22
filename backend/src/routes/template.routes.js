@@ -4,6 +4,7 @@ import {
   createTemplate,
   deleteTemplate,
   getTemplateById,
+  getTemplateCounts,
   getTemplateFiles,
   getTemplates,
   searchTemplates,
@@ -15,6 +16,7 @@ const router = Router();
 router.post("/", createTemplate);
 router.get("/", getTemplates);
 router.get("/search", searchTemplates);
+router.get("/counts", getTemplateCounts);
 router.get("/:id", getTemplateById);
 router.get("/:id/files", getTemplateFiles);
 router.patch("/:id", updateTemplate);
